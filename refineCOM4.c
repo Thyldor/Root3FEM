@@ -1,3 +1,5 @@
+//compile using: mex -R2018a refineCOM4.c
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
