@@ -55,18 +55,7 @@ struct edge * findEdge(int i1, int i2){
     }
     return NULL;
 }
-struct triangle * findTriangle(int i1, int i2, int i3){
-    for(int i=0; i< triangleIndex; i++){
-        if((triangles[i].vertex1->tag == i1 && triangles[i].vertex2->tag == i2 && triangles[i].vertex3->tag == i3) ||
-           (triangles[i].vertex1->tag == i1 && triangles[i].vertex2->tag == i3 && triangles[i].vertex3->tag == i2) ||
-           (triangles[i].vertex1->tag == i2 && triangles[i].vertex2->tag == i1 && triangles[i].vertex3->tag == i3) ||
-           (triangles[i].vertex1->tag == i2 && triangles[i].vertex2->tag == i3 && triangles[i].vertex3->tag == i1) ||
-           (triangles[i].vertex1->tag == i3 && triangles[i].vertex2->tag == i1 && triangles[i].vertex3->tag == i2) ||
-           (triangles[i].vertex1->tag == i3 && triangles[i].vertex2->tag == i2 && triangles[i].vertex3->tag == i1))
-            return &triangles[i];
-    }
-    return NULL;
-}
+
 struct vertex * findThirdVertex(struct triangle * t, struct edge *e){
     if(t->vertex1->tag != e->a->tag && t->vertex1->tag != e->b->tag) return t->vertex1;
     if(t->vertex2->tag != e->a->tag && t->vertex2->tag != e->b->tag) return t->vertex2;
@@ -177,7 +166,7 @@ struct edge * findRefinementEdge(struct triangle *t){
     return NULL;
 }
 
-int isObtuse(struct triangle *t){//returns the edge opposite the obtuse angle if it exists
+int isObtuse(struct triangle *t){//returns the edge index opposite the obtuse angle if it exists
     double a1, a2, a3;//inner product at each vertex
     
     a2 = (t->vertex1->x - t->vertex2->x)*(t->vertex3->x - t->vertex2->x) + (t->vertex1->y - t->vertex2->y)*(t->vertex3->y - t->vertex2->y);
@@ -186,7 +175,7 @@ int isObtuse(struct triangle *t){//returns the edge opposite the obtuse angle if
     a3 = (t->vertex1->x - t->vertex3->x)*(t->vertex2->x - t->vertex3->x) + (t->vertex1->y - t->vertex3->y)*(t->vertex2->y - t->vertex3->y);
     if(a3<0) return 1;
     
-    a1 = (t->vertex2->x - t->vertex1->x)*(t->vertex3->x - t->vertex1->x) + (t->vertex2->y - t->vertex1->y)*(t->vertex3->y - t->vertex1->y); //angle at v1
+    a1 = (t->vertex2->x - t->vertex1->x)*(t->vertex3->x - t->vertex1->x) + (t->vertex2->y - t->vertex1->y)*(t->vertex3->y - t->vertex1->y); 
     if(a1<0) return 2;
     
     return 0;      
@@ -413,11 +402,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
     noOfTs = mxGetM(prhs[4]);
     typeIndex = mxGetM(prhs[5]);
     
-    vertices = malloc(sizeof(*vertices)*(vertexIndex + (2*triangleIndex) + 1));//(vertexIndex+2*triangleIndex+1)
+    vertices = malloc(sizeof(*vertices)*(2*vertexIndex + (2*triangleIndex) + 1));//(vertexIndex+2*triangleIndex+1)
     if(vertices == NULL) mexErrMsgIdAndTxt("bitmarker:refineCOM", "Failed vertex memory allocation");
-    triangles = malloc(sizeof(*triangles) * 3 * triangleIndex);//3 * triangleIndex
+    triangles = malloc(sizeof(*triangles) * 4 * triangleIndex);//3 * triangleIndex
     if(vertices == NULL) mexErrMsgIdAndTxt("bitmarker:refineCOM", "Failed triangle memory allocation");
-    edges = malloc(sizeof(*edges) * 3 * ((3*triangleIndex + bEdges)/2)); //3 * ((3*triangleIndex + bEdges)/2)
+    edges = malloc(sizeof(*edges) * 4 * ((3*triangleIndex + bEdges)/2)); //3 * ((3*triangleIndex + bEdges)/2)
     if(vertices == NULL) mexErrMsgIdAndTxt("bitmarker:refineCOM", "Failed edge memory allocation");
     
     mxVertices = mxGetDoubles(prhs[0]);
